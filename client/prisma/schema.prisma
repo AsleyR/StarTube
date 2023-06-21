@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model comment {
+  comment_id       String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id          String
+  video_id         String   @db.Uuid
+  comment          String?
+  likes            Int      @default(0)
+  dislikes         Int      @default(0)
+  reply_comment_id String?  @db.Uuid
+  published_date   DateTime @default(now()) @db.Timestamp(6)
+  video            video    @relation(fields: [video_id], references: [video_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_video_id")
+}
+
+model video {
+  video_id       String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title          String    @db.VarChar(255)
+  description    String?
+  user_id        String
+  published_date DateTime  @default(now()) @db.Timestamp(6)
+  likes          Int       @default(0)
+  dislikes       Int       @default(0)
+  video_url      String
+  comment        comment[]
+}
